@@ -1,18 +1,19 @@
-# Spec Document Reviewer Prompt Template
+# Design Document Reviewer Prompt Template
 
-Use this template when dispatching a spec document reviewer subagent.
+Use this template when dispatching a living design document reviewer subagent.
 
-**Purpose:** Verify the spec is complete, consistent, and ready for implementation planning.
+<!-- ADR-001: reviewer now checks canonical living documents instead of dated specs. -->
+**Purpose:** Verify the updated living document is complete, consistent, and ready for implementation planning.
 
-**Dispatch after:** Spec document is written to docs/superpowers/specs/
+**Dispatch after:** Canonical living document is updated.
 
 ```
 Subagent (general-purpose):
-  description: "Review spec document"
+  description: "Review living design document"
   prompt: |
-    You are a spec document reviewer. Verify this spec is complete and ready for planning.
+    You are a living design document reviewer. Verify this document is complete and ready for planning.
 
-    **Spec to review:** [SPEC_FILE_PATH]
+    **Document to review:** [DOCUMENT_FILE_PATH]
 
     ## What to Check
 
@@ -21,8 +22,8 @@ Subagent (general-purpose):
     | Completeness | TODOs, placeholders, "TBD", incomplete sections |
     | Consistency | Internal contradictions, conflicting requirements |
     | Clarity | Requirements ambiguous enough to cause someone to build the wrong thing |
-    | Scope | Focused enough for a single plan — not covering multiple independent subsystems |
-    | YAGNI | Unrequested features, over-engineering |
+    | Scope | Focused enough for a single execution contract — not covering multiple independent subsystems |
+    | Impact Surface | Affected code, skills, docs, decisions, verification, and no-update rationale are named |
 
     ## Calibration
 
@@ -35,7 +36,7 @@ Subagent (general-purpose):
 
     ## Output Format
 
-    ## Spec Review
+    ## Document Review
 
     **Status:** Approved | Issues Found
 

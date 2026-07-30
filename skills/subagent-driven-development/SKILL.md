@@ -9,7 +9,7 @@ Execute plan by dispatching a fresh implementer subagent per task, a task review
 
 **Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
 
-**Core principle:** Fresh subagent per task + task review (spec + quality) + broad final review = high quality, fast iteration
+**Core principle:** Fresh subagent per task + task review (spec + quality) + closed impact surface + broad final review = high quality, fast iteration
 
 **Narration:** between tool calls, narrate at most one short line — the
 ledger and the tool results carry the record.
@@ -119,40 +119,48 @@ controllers that lost their place have re-dispatched entire completed task
 sequences — the single most expensive failure observed. Track progress in
 a ledger file, not only in todos.
 
-- Each plan owns a workspace: at skill start, run this skill's
-  `scripts/sdd-workspace PLAN_FILE` — it prints the plan's git-ignored
-  directory (`<repo-root>/.superpowers/sdd/<plan-basename>/`), home to
-  every artifact for THIS plan: ledger, briefs, reports, review packages.
-  Another plan's directory is never yours to read or write.
-- Check for this plan's ledger at `<workspace>/progress.md`. If its first
-  line names your plan file, tasks with a `Task <N>: complete` line are DONE
-  — do not re-dispatch them; resume at the first task without one. A task
+<!-- ADR-001: SDD keeps ledgers as execution traces and closes living-document impact before completion. -->
+If a task changes persistent agent guidance, invoke maintaining-living-documents and carry its Impact Surface through the task brief, ledger, and reviewer context.
+
+- Each execution contract owns a workspace: at skill start, pass the contract
+  file path as `PLAN_FILE` to this skill's `scripts/sdd-workspace PLAN_FILE`.
+  The default contract path from writing-plans is
+  `.superpowers/plans/<feature-name>.md`; it must exist, and
+  `.superpowers/plans/.gitignore` must contain `*` before the contract is
+  written so scratch contracts are not accidentally committed.
+  `scripts/sdd-workspace` then creates its own self-ignoring workspace at
+  `<repo-root>/.superpowers/sdd/<contract-basename>/`, home to every artifact
+  for THIS contract: ledger, briefs, reports, review packages. Another
+  contract's directory is never yours to read or write.
+- Check for this contract's ledger at `<workspace>/progress.md`. If its first
+  line names your contract file, tasks with a `Task <N>: complete` line are
+  DONE — do not re-dispatch them; resume at the first task without one. A task
   whose last line is a fix round is mid-loop: resume the loop at the next
-  round. A ledger whose first line names a different plan file — or a stray
+  round. A ledger whose first line names a different contract file — or a stray
   ledger at the old flat path `.superpowers/sdd/progress.md` — is another
-  plan's progress: leave it in place and start your own, fresh.
+  contract's progress: leave it in place and start your own, fresh.
 - Create the ledger with its identity as the first line:
-  `# SDD ledger — plan: <plan file path>`.
+  `# SDD ledger — contract: <contract file path>`.
 - The ledger is your recovery map: the commits it names exist in git even
   when your context no longer remembers creating them. After compaction,
   trust the ledger and `git log` over your own recollection.
 - `git clean -fdx` will destroy the workspace (it's git-ignored scratch); if
   that happens, recover from `git log`.
 
-Read the plan once, note its context and Global Constraints, and create a
-todo per task.
+Read the execution contract once, note its context, Global Constraints, governing living document or decision, and Impact Surface, then create a todo per task.
 
-Before dispatching Task 1, scan the plan once for conflicts:
+Before dispatching Task 1, scan the contract once for conflicts:
 
-- tasks that contradict each other or the plan's Global Constraints
-- anything the plan explicitly mandates that the review rubric treats as a
+- tasks that contradict each other, Global Constraints, or the governing living document
+- missing or stale Impact Surface entries for affected code, skills, docs, decisions, or verification
+- anything the contract explicitly mandates that the review rubric treats as a
   defect (a test that asserts nothing, verbatim duplication of a logic block)
 
 Present everything you find to your human partner as one batched question —
-each finding beside the plan text that mandates it, asking which governs —
-before execution begins, not one interrupt per discovery mid-plan. If the
-scan is clean, proceed without comment. The review loop remains the net for
-conflicts that only emerge from implementation.
+each finding beside the contract or document text that mandates it, asking
+which governs — before execution begins, not one interrupt per discovery
+mid-plan. If the scan is clean, proceed without comment. The review loop
+remains the net for conflicts that only emerge from implementation.
 
 ## Model Selection
 
@@ -210,10 +218,11 @@ and fix-round diffs need it.
   task fits in the project; (2) the brief path, introduced as "read this
   first — it is your requirements, with the exact values to use verbatim";
   (3) interfaces and decisions from earlier tasks that the brief cannot
-  know; (4) your resolution of any ambiguity you noticed in the brief;
-  (5) the report-file path and report contract. Exact values (numbers,
-  magic strings, signatures, test cases) appear only in the brief. Never
-  make a subagent read the whole plan file.
+  know; (4) governing living-document or decision references and any Impact
+  Surface obligations; (5) your resolution of any ambiguity you noticed in
+  the brief; (6) the report-file path and report contract. Exact values
+  (numbers, magic strings, signatures, test cases) appear only in the brief.
+  Never make a subagent read the whole plan file.
 - **Report file:** name the implementer's report file after the brief
   (brief `…/task-N-brief.md` → report `…/task-N-report.md`) and put it in
   the dispatch prompt. The implementer writes the full report there and
@@ -441,8 +450,8 @@ Use superpowers:finishing-a-development-branch.
 You: I'm using Subagent-Driven Development to execute this plan.
 
 [Setup: worktree verified]
-[Read plan file once: docs/superpowers/plans/feature-plan.md]
-[Resolve workspace: scripts/sdd-workspace docs/superpowers/plans/feature-plan.md — no ledger inside, fresh start]
+[Read execution contract once: docs/context/README.md + docs/context/deployment/requirements.md + .superpowers/plans/feature-plan.md]
+[Resolve workspace: scripts/sdd-workspace .superpowers/plans/feature-plan.md — no ledger inside, fresh start]
 [Create todos for all tasks]
 
 Task 1: Hook installation script
@@ -460,7 +469,7 @@ Implementer: [Later]
   - Committed
 
 [Run review-package PLAN_FILE BASE HEAD; dispatch task reviewer with the printed path]
-Task reviewer: Spec ✅ - all requirements met, nothing extra.
+Task reviewer: Contract ✅ - all requirements met, nothing extra.
   Strengths: Good test coverage, clean. Issues: None. Task quality: Approved.
 
 [Ledger: Task 1: complete (commits a1b2c3d..d4e5f6a, review clean)]

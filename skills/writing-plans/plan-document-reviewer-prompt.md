@@ -1,28 +1,29 @@
-# Plan Document Reviewer Prompt Template
+# Execution Contract Reviewer Prompt Template
 
-Use this template when dispatching a plan document reviewer subagent.
+Use this template when dispatching an execution contract reviewer subagent.
 
-**Purpose:** Verify the plan is complete, matches the spec, and has proper task decomposition.
+<!-- ADR-001: reviewer now checks contracts against living documents and impact surfaces. -->
+**Purpose:** Verify the execution contract is complete, matches the governing living document or decision, and has proper task decomposition.
 
-**Dispatch after:** The complete plan is written.
+**Dispatch after:** The complete execution contract is written.
 
 ```
 Subagent (general-purpose):
-  description: "Review plan document"
+  description: "Review execution contract"
   prompt: |
-    You are a plan document reviewer. Verify this plan is complete and ready for implementation.
+    You are an execution contract reviewer. Verify this contract is complete and ready for implementation.
 
-    **Plan to review:** [PLAN_FILE_PATH]
-    **Spec for reference:** [SPEC_FILE_PATH]
+    **Contract to review:** [CONTRACT_FILE_PATH]
+    **Governing document or decision:** [GOVERNING_DOC_PATH]
 
     ## What to Check
 
     | Category | What to Look For |
     |----------|------------------|
     | Completeness | TODOs, placeholders, incomplete tasks, missing steps |
-    | Spec Alignment | Plan covers spec requirements, no major scope creep |
+    | Living-document Alignment | Contract covers governing document requirements, no major scope creep |
     | Task Decomposition | Tasks have clear boundaries, steps are actionable |
-    | Buildability | Could an engineer follow this plan without getting stuck? |
+    | Impact Surface | Code, skills, docs, decisions, verification, and no-update rationale are named |
 
     ## Calibration
 
@@ -30,12 +31,12 @@ Subagent (general-purpose):
     An implementer building the wrong thing or getting stuck is an issue.
     Minor wording, stylistic preferences, and "nice to have" suggestions are not.
 
-    Approve unless there are serious gaps — missing requirements from the spec,
-    contradictory steps, placeholder content, or tasks so vague they can't be acted on.
+    Approve unless there are serious gaps — missing requirements from the governing document,
+    contradictory steps, placeholder content, stale Impact Surface entries, or tasks so vague they can't be acted on.
 
     ## Output Format
 
-    ## Plan Review
+    ## Execution Contract Review
 
     **Status:** Approved | Issues Found
 

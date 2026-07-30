@@ -26,10 +26,11 @@ You MUST create a task for each of these items and complete them in order:
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
-7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-8. **User reviews written spec** — ask user to review the spec file before proceeding
-9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+<!-- ADR-001: replaces default dated design-spec artifacts with canonical living-document updates. -->
+6. **Update living document** — use maintaining-living-documents to update the canonical domain document, append a bounded change log, and record the impact surface. Create dated specs only when the human partner explicitly asks for a permanent snapshot.
+7. **Document self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
+8. **User reviews updated document** — ask user to review the canonical document before proceeding
+9. **Transition to implementation** — invoke writing-plans skill to create the execution contract
 
 ## Process Flow
 
@@ -40,9 +41,9 @@ digraph brainstorming {
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
-    "Write design doc" [shape=box];
-    "Spec self-review\n(fix inline)" [shape=box];
-    "User reviews spec?" [shape=diamond];
+    "Update living document" [shape=box];
+    "Document self-review\n(fix inline)" [shape=box];
+    "User reviews document?" [shape=diamond];
     "Invoke writing-plans skill" [shape=doublecircle];
 
     "Explore project context" -> "Ask clarifying questions";
@@ -50,15 +51,15 @@ digraph brainstorming {
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
-    "User approves design?" -> "Write design doc" [label="yes"];
-    "Write design doc" -> "Spec self-review\n(fix inline)";
-    "Spec self-review\n(fix inline)" -> "User reviews spec?";
-    "User reviews spec?" -> "Write design doc" [label="changes requested"];
-    "User reviews spec?" -> "Invoke writing-plans skill" [label="approved"];
+    "User approves design?" -> "Update living document" [label="yes"];
+    "Update living document" -> "Document self-review\n(fix inline)";
+    "Document self-review\n(fix inline)" -> "User reviews document?";
+    "User reviews document?" -> "Update living document" [label="changes requested"];
+    "User reviews document?" -> "Invoke writing-plans skill" [label="approved"];
 }
 ```
 
-**The terminal state is invoking writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming is writing-plans.
+**The terminal state is invoking writing-plans after the living-document update is complete.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill during brainstorming.
 
 ## The Process
 
@@ -66,7 +67,7 @@ digraph brainstorming {
 
 - Check out the current project state first (files, docs, recent commits)
 - Before asking detailed questions, assess scope: if the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.
-- If the project is too large for a single spec, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own spec → plan → implementation cycle.
+- If the project is too large for one domain document and execution contract, help the user decompose it into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal flow. Each sub-project updates its canonical domain document and gets its own execution snapshot when implementation planning starts.
 - For appropriately-scoped projects, ask questions one at a time to refine the idea
 - Prefer multiple choice questions when possible, but open-ended is fine too
 - Only one question per message - if a topic needs more exploration, break it into multiple questions
@@ -102,34 +103,37 @@ digraph brainstorming {
 
 ## After the Design
 
-**Documentation:**
+**Living-document update:**
+<!-- ADR-001: keeps design decisions in the current canonical document instead of creating dated branches by default. -->
 
-- Write the validated design (spec) to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
-  - (User preferences for spec location override this default)
-- Use elements-of-style:writing-clearly-and-concisely skill if available
-- Commit the design document to git
+- Invoke maintaining-living-documents before writing or changing persistent guidance.
+- Update the canonical domain document in place, append a bounded change-log entry, and record the Impact Surface.
+- Create a dated spec only when the human partner explicitly asks for a permanent snapshot.
+- Use elements-of-style:writing-clearly-and-concisely skill if available.
+- Commit the document update to git.
 
-**Spec Self-Review:**
-After writing the spec document, look at it with fresh eyes:
+**Document Self-Review:**
+After updating the document, look at it with fresh eyes:
 
 1. **Placeholder scan:** Any "TBD", "TODO", incomplete sections, or vague requirements? Fix them.
-2. **Internal consistency:** Do any sections contradict each other? Does the architecture match the feature descriptions?
-3. **Scope check:** Is this focused enough for a single implementation plan, or does it need decomposition?
-4. **Ambiguity check:** Could any requirement be interpreted two different ways? If so, pick one and make it explicit.
+2. **Internal consistency:** Do sections contradict each other? Does the architecture match the feature descriptions?
+3. **Scope check:** Is this focused enough for a single execution contract, or does it need decomposition?
+4. **Impact check:** Does the Impact Surface name affected code, skills, docs, decisions, verification, and any no-update rationale?
+5. **Ambiguity check:** Could any requirement be interpreted two different ways? If so, pick one and make it explicit.
 
 Fix any issues inline. No need to re-review — just fix and move on.
 
 **User Review Gate:**
-After the spec review loop passes, ask the user to review the written spec before proceeding:
+After the document review loop passes, ask the user to review the updated canonical document before proceeding:
 
-> "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
+> "Document updated and committed at `<path>`. Please review it and let me know if you want changes before we create the execution contract."
 
-Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
+Wait for the user's response. If they request changes, make them and re-run the document review loop. Only proceed once the user approves.
 
 **Implementation:**
 
-- Invoke the writing-plans skill to create a detailed implementation plan
-- Do NOT invoke any other skill. writing-plans is the next step.
+- Invoke the writing-plans skill to create the execution contract after the living-document update is complete.
+- Do NOT invoke other implementation skills before writing-plans.
 
 ## Visual Companion
 

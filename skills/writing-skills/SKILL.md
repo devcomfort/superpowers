@@ -19,6 +19,9 @@ You write test cases (pressure scenarios with subagents), watch them fail (basel
 
 **Official guidance:** For Anthropic's official skill authoring best practices, see anthropic-best-practices.md. This document provides additional patterns and guidelines that complement the TDD-focused approach in this skill.
 
+<!-- ADR-001: process-changing skill edits must carry a decision trace inside the Superpowers skillset. -->
+For process-changing skill edits, use maintaining-living-documents to create or update the governing decision record and add short inline ADR comments near changed skill sections.
+
 ## What is a Skill?
 
 A **skill** is a reference guide for proven techniques, patterns, or tools. Skills help future agents find and apply effective approaches.
@@ -641,6 +644,8 @@ Deploying untested skills = deploying untested code. It's a violation of quality
 - [ ] Keywords throughout for search (errors, symptoms, tools)
 - [ ] Clear overview with core principle
 - [ ] Address specific baseline failures identified in RED
+- [ ] For process-changing skill edits, create or update the governing Superpowers decision record
+- [ ] Add short inline ADR comments near changed skill sections
 - [ ] Guidance form matches the failure type (see Match the Form to the Failure)
 - [ ] For behavior-shaping guidance: wording micro-tested against a no-guidance control (5+ reps, every flagged match read manually) — N/A for pure reference skills
 - [ ] Code inline OR link to separate file

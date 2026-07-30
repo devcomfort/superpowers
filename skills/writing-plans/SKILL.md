@@ -15,12 +15,13 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Context:** If working in an isolated worktree, it should have been created via the `superpowers:using-git-worktrees` skill at execution time.
 
-**Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
-- (User preferences for plan location override this default)
+<!-- ADR-001: persistent implementation guidance now updates living documents; dated plans are snapshots only. -->
+**Default output:** update the canonical living document and write the execution snapshot to `.superpowers/plans/<feature-name>.md` when execution needs a separate task contract.
+- Before writing that snapshot, create `.superpowers/plans/.gitignore` containing `*` so scratch execution contracts are not accidentally committed. Permanent dated plans under `docs/superpowers/plans/` only when the human partner explicitly asks for them.
 
 ## Scope Check
 
-If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
+If the governing document covers multiple independent subsystems, it should have been broken into sub-project domain documents during brainstorming. If it wasn't, suggest breaking this into separate execution contracts — one per subsystem. Each contract should produce working, testable software on its own.
 
 ## File Structure
 
@@ -53,7 +54,7 @@ independently testable deliverable.
 
 ## Plan Document Header
 
-**Every plan MUST start with this header:**
+**Every execution snapshot MUST start with this header:**
 
 ```markdown
 # [Feature Name] Implementation Plan
@@ -72,6 +73,10 @@ independently testable deliverable.
 naming and copy rules, platform requirements — one line each, with exact
 values copied verbatim from the spec. Every task's requirements implicitly
 include this section.]
+
+## Impact Surface
+
+[Code, Skills, Docs, Decisions, Verification, and No-update rationale copied from maintaining-living-documents.]
 
 ---
 ```
@@ -137,21 +142,23 @@ Every step must contain the actual content an engineer needs. These are **plan f
 
 ## Self-Review
 
-After writing the complete plan, look at the spec with fresh eyes and check the plan against it. This is a checklist you run yourself — not a subagent dispatch.
+After writing the complete execution contract, look at the governing document with fresh eyes and check the contract against it. This is a checklist you run yourself — not a subagent dispatch.
 
-**1. Spec coverage:** Skim each section/requirement in the spec. Can you point to a task that implements it? List any gaps.
+**1. Living-document coverage:** Can you point to the canonical document section or decision that governs each task? List any gaps.
 
-**2. Placeholder scan:** Search your plan for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
+**2. Placeholder scan:** Search your contract for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
 
-**3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
+**3. Impact Surface:** Does the contract name affected code, skills, docs, decisions, verification, and no-update rationale?
 
-If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
+**4. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
+
+If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a governing-document requirement with no task, add the task.
 
 ## Execution Handoff
 
-After saving the plan, offer execution choice:
+After updating the living document and writing any required execution snapshot, offer execution choice:
 
-**"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Two execution options:**
+**"Implementation contract ready. Source of truth: `<living-doc-path>`; execution snapshot: `.superpowers/plans/<feature-name>.md`. Two execution options:**
 
 **1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
 

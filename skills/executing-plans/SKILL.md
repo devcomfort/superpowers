@@ -7,7 +7,9 @@ description: Use when you have a written implementation plan to execute in a sep
 
 ## Overview
 
-Load plan, review critically, execute all tasks, report when complete.
+Load the execution contract, review critically, execute all tasks, close the impact surface, report when complete.
+
+<!-- ADR-001: execution closes living-document impact instead of treating the plan as the only durable record. -->
 
 **Announce at start:** "I'm using the executing-plans skill to implement this plan."
 
@@ -15,24 +17,25 @@ Load plan, review critically, execute all tasks, report when complete.
 
 ## The Process
 
-### Step 1: Load and Review Plan
+### Step 1: Load and Review Contract
 1. Ensure an isolated workspace: use superpowers:using-git-worktrees to create one or verify the existing one
-2. Read plan file
-3. Review critically - identify any questions or concerns about the plan
+2. Read the execution contract and any governing living document or decision it references
+3. Review critically - identify unclear instructions, stale guidance, missing Impact Surface entries, and plan/document conflicts
 4. If concerns: Raise them with your human partner before starting
-5. If no concerns: Create todos for the plan items and proceed
+5. If no concerns: Create todos for the contract items and proceed
 
 ### Step 2: Execute Tasks
 
 For each task:
 1. Mark as in_progress
-2. Follow each step exactly (plan has bite-sized steps)
+2. Follow each step exactly (the contract has bite-sized steps)
 3. Run verifications as specified
-4. Mark as completed
+4. Update the impacted living document or record no-update rationale when the task changes persistent guidance
+5. Mark as completed
 
 ### Step 3: Complete Development
 
-After all tasks complete and verified:
+After all tasks complete, verified, and document impact surfaces are closed:
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
 - **REQUIRED SUB-SKILL:** Use superpowers:finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice
